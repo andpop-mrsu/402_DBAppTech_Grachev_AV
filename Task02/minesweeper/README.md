@@ -72,7 +72,7 @@
    - Или если ваш пакет опубликован на Packagist, установите его глобально:
 
    ```bash
-   composer global require artemaaaaaaaaaaaaaaaaaaa/minesweeper
+   composer global require artyo/minesweeper
    ```
 
    - И затем выполните команду:
@@ -91,4 +91,4 @@
 - [Composer Documentation](https://getcomposer.org/doc/)
 
 ## Ссылки на пакеты
-- [Packagist пакет Minesweeper](https://packagist.org/packages/artemaaaaaaaaaaaaaaaaaaa/minesweeper) 
+- [Packagist пакет Minesweeper](https://packagist.org/packages/artyo/minesweeper) 

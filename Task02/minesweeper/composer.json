@@ -1,0 +1,20 @@
+{
+    "name": "artyo/minesweeper",
+    "version": "1.0.2",
+    "license": "MIT",
+    "require": {
+        "wp-cli/php-cli-tools": "^0.12.6"
+    },
+    "autoload": {
+        "psr-4": {
+            "Artyo\\Minesweeper\\": "src/"
+        },
+        "files": [
+            "src/Controller.php",
+            "src/View.php"
+        ]
+    },
+    "bin": [
+        "bin/minesweeper"
+    ]
+}

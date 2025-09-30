@@ -1,0 +1,21 @@
+{
+    "name": "artyo/minesweeper",
+    "description": "Minesweeper Game",
+    "version": "1.2.1",
+    "license": "MIT",
+    "require": {
+        "wp-cli/php-cli-tools": "^0.12.6"
+    },
+    "autoload": {
+        "psr-4": {
+            "Artyo\\Task03\\": "src/"
+        }
+    },
+    "bin": ["bin/minesweeper"],
+    "authors": [
+        {
+            "name": "artemaaaaaaaaaaaaaaaaaaa",
+            "email": "artm-grachev@mail.ru"
+        }
+    ]
+}

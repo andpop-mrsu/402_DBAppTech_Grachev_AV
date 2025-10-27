@@ -16,14 +16,17 @@ class DatabaseService
 
     private function initializeDatabase(): void
     {
+        
         $dir = dirname($this->dbPath);
         if (!is_dir($dir)) {
             mkdir($dir, 0755, true);
         }
 
         try {
+           
             R::setup('sqlite:' . $this->dbPath);
             
+       
             $this->createTables();
         } catch (\Exception $e) {
             throw new \RuntimeException("Не удалось подключиться к базе данных: " . $e->getMessage());
@@ -32,44 +35,42 @@ class DatabaseService
 
     private function createTables(): void
     {
-        $tables = ['game', 'move'];
+     
+        if (!R::inspect('game')) {
+    
+            $game = R::dispense('game');
+            $game->date_played = date('Y-m-d H:i:s');
+            $game->player_name = 'temp';
+            $game->field_size = 1;
+            $game->mines_count = 1;
+            $game->mine_positions = '[]';
+            $game->game_result = 'temp';
+            $game->total_moves = 0;
+            $game->created_at = date('Y-m-d H:i:s');
+            
+            $gameId = R::store($game);
+            R::trash($game); 
+        }
         
-        foreach ($tables as $table) {
-            if (!R::inspect($table)) {
-                R::exec("
-                    CREATE TABLE IF NOT EXISTS game (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        date_played TEXT NOT NULL,
-                        player_name TEXT NOT NULL,
-                        field_size INTEGER NOT NULL,
-                        mines_count INTEGER NOT NULL,
-                        mine_positions TEXT NOT NULL,
-                        game_result TEXT NOT NULL,
-                        total_moves INTEGER NOT NULL,
-                        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-                    )
-                ");
-                
-                R::exec("
-                    CREATE TABLE IF NOT EXISTS move (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        game_id INTEGER NOT NULL,
-                        move_number INTEGER NOT NULL,
-                        row_coord INTEGER NOT NULL,
-                        col_coord INTEGER NOT NULL,
-                        move_type TEXT NOT NULL,
-                        result TEXT NOT NULL,
-                        FOREIGN KEY (game_id) REFERENCES game (id) ON DELETE CASCADE
-                    )
-                ");
-                break;
-            }
+        if (!R::inspect('move')) {
+
+            $move = R::dispense('move');
+            $move->game_id = 1;
+            $move->move_number = 1;
+            $move->row_coord = 0;
+            $move->col_coord = 0;
+            $move->move_type = 'temp';
+            $move->result = 'temp';
+            
+            R::store($move);
+            R::trash($move); 
         }
     }
 
     public function saveGame(GameRecord $gameRecord): int
     {
         try {
+
             $game = R::dispense('game');
             $game->date_played = $gameRecord->getDatePlayed();
             $game->player_name = $gameRecord->getPlayerName();
@@ -102,37 +103,59 @@ class DatabaseService
 
     public function getAllGames(): array
     {
-        $games = R::getAll("
-            SELECT id, date_played, player_name, field_size, mines_count, game_result, total_moves
-            FROM game
-            ORDER BY created_at DESC
-        ");
-
-        return $games;
+        $gameBeans = R::findAll('game', ' ORDER BY created_at DESC ');
+        
+        $result = [];
+        foreach ($gameBeans as $bean) {
+            $result[] = [
+                'id' => $bean->id,
+                'date_played' => $bean->date_played,
+                'player_name' => $bean->player_name,
+                'field_size' => $bean->field_size,
+                'mines_count' => $bean->mines_count,
+                'game_result' => $bean->game_result,
+                'total_moves' => $bean->total_moves
+            ];
+        }
+        
+        return $result;
     }
 
     public function getGameById(int $gameId): ?array
     {
-        $game = R::getRow("
-            SELECT id, date_played, player_name, field_size, mines_count, mine_positions, game_result, total_moves
-            FROM game
-            WHERE id = ?
-        ", [$gameId]);
+        $gameBean = R::findOne('game', ' id = ? ', [$gameId]);
 
-        if (!$game) {
+        if (!$gameBean) {
             return null;
         }
 
-        $moves = R::getAll("
-            SELECT move_number, row_coord, col_coord, move_type, result
-            FROM move
-            WHERE game_id = ?
-            ORDER BY move_number
-        ", [$gameId]);
+        $moveBeans = R::findAll('move', ' game_id = ? ORDER BY move_number', [$gameId]);
+        
+        $moves = [];
+        foreach ($moveBeans as $moveBean) {
+            $moves[] = [
+                'move_number' => $moveBean->move_number,
+                'row_coord' => $moveBean->row_coord,
+                'col_coord' => $moveBean->col_coord,
+                'move_type' => $moveBean->move_type,
+                'result' => $moveBean->result
+            ];
+        }
 
-        $game['moves'] = $moves;
+        $result = [
+            'id' => $gameBean->id,
+            'date_played' => $gameBean->date_played,
+            'player_name' => $gameBean->player_name,
+            'field_size' => $gameBean->field_size,
+            'mines_count' => $gameBean->mines_count,
+            'mine_positions' => $gameBean->mine_positions,
+            'game_result' => $gameBean->game_result,
+            'total_moves' => $gameBean->total_moves
+        ];
+        
+        $result['moves'] = $moves;
 
-        return $game;
+        return $result;
     }
 
     public function deleteGame(int $gameId): bool

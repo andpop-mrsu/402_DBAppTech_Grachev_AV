@@ -1,0 +1,35 @@
+/vendor/
+composer.lock
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+!Task05/minesweeper/data/*.db
+
+# Executable files
+/bin/
+**/bin/
+*.exe
+
+# Task05 exceptions
+!Task05/minesweeper/src/
+!Task05/minesweeper/composer.json
+!Task05/minesweeper/README.md
+!Task05/minesweeper/general_specification.md
+!Task05/minesweeper/bin/
+!Task05/minesweeper/data/
+!Task05/minesweeper/.gitignore
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

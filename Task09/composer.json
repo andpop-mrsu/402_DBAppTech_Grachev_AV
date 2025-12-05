@@ -1,0 +1,16 @@
+{
+    "name": "minesweeper/task09",
+    "description": "Minesweeper game backend with Slim Framework",
+    "type": "project",
+    "require": {
+        "php": ">=7.4",
+        "slim/slim": "^4.0",
+        "slim/psr7": "^1.0",
+        "slim/http": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "": "src/"
+        }
+    }
+}
